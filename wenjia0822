@@ -1,0 +1,28 @@
+# U1243000 SHIH Meng-Hsien
+
+def CalculateFinalFunction():
+    # Indent your code below:
+    # Assign 80 and 50 to the variables score1 and score2:
+    s1 =80
+    s2 =50
+    # Calculate the average of the two scores, and assign it to the variable avg:
+    avg = (s1+s2)/2 # Change this line
+    # print the average:
+    print(avg)
+
+    # if the average is greater than 60, print "pass":
+    if avg>60:
+        print("pass")
+    # if the average is less than 60, print "fail":
+    if avg<60:
+        print("fail")
+    return avg
+
+# ----------------------------------------
+import unittest
+class TestStringMethods(unittest.TestCase):
+    def test_myFunction(self): 
+        f = CalculateFinalFunction()
+        self.assertTrue(f==65)
+if __name__ == '__main__':
+    unittest.main()
