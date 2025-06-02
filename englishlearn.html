@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>英文單字填空練習器</title>
+  <style>
+    body { font-family: "Arial", sans-serif; background-color: #f4f4f4; padding: 30px; color: #333; }
+    h1 { color: #007BFF; }
+    .question { font-size: 1.2em; margin-top: 20px; }
+    #feedback, #logDisplay { margin-top: 10px; font-weight: bold; white-space: pre-wrap; }
+    input { padding: 5px; font-size: 1em; }
+    button { padding: 6px 12px; font-size: 1em; margin: 5px 10px 10px 0; }
+    #logDisplay {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📘 英文單字填空練習器</h1>
+
+<div class="question" id="question"></div>
+<input type="text" id="answerInput" placeholder="請輸入完整單字">
+<br>
+<button onclick="checkAnswer()">提交答案</button>
+<button onclick="restart()">重新挑戰</button>
+<button onclick="toggleLog('last')">切換顯示最近一次紀錄</button>
+<button onclick="toggleLog('all')">切換顯示所有紀錄</button>
+
+<div id="feedback"></div>
+<div id="score"></div>
+
+<hr>
+<h3>📂 歷史紀錄</h3>
+<div id="logDisplay"></div>
+
+<script>
+const questions = [
+  { hint: "動物", word: "animal" },
+  { hint: "書", word: "book" },
+  { hint: "學校", word: "school" },
+  { hint: "蘋果", word: "apple" },
+  { hint: "朋友", word: "friend" },
+  { hint: "家庭", word: "family" },
+  { hint: "跑", word: "run" },
+  { hint: "聽", word: "listen" },
+  { hint: "笑", word: "laugh" },
+  { hint: "學習", word: "learn" }
+];
+
+let currentIndex = 0;
+let score = 0;
+let shuffled = [];
+let currentLog = [];
+let allLogs = [];
+
+function generatePuzzle(word) {
+  return word.length <= 3
+    ? word[0] + "_".repeat(word.length - 1)
+    : word[0] + "_".repeat(word.length - 2) + word[word.length - 1];
+}
+
+function displayQuestion() {
+  if (currentIndex < shuffled.length) {
+    const q = shuffled[currentIndex];
+    document.getElementById("question").innerText =
+      `${currentIndex + 1}. 提示：${q.hint} → ${generatePuzzle(q.word)}`;
+    document.getElementById("answerInput").value = "";
+    document.getElementById("feedback").innerText = "";
+  } else {
+    const rate = ((score / shuffled.length) * 100).toFixed(1);
+    const summary = `🎉 練習完成！你答對了 ${score} / ${shuffled.length} 題，正確率：${rate}%`;
+    document.getElementById("question").innerText = summary;
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("score").innerText = "";
+    currentLog.push(summary);
+    allLogs.push([...currentLog]);
+  }
+}
+
+function checkAnswer() {
+  const input = document.getElementById("answerInput").value.trim().toLowerCase();
+  const q = shuffled[currentIndex];
+  const correct = q.word;
+  let feedback = "";
+  if (input === correct) {
+    feedback = "✅ 正確！";
+    score++;
+    currentLog.push(`[${currentIndex + 1}] ${q.hint} → ${generatePuzzle(q.word)}\n你的答案：${input} ✅`);
+  } else {
+    feedback = `❌ 錯誤，正確答案是：${correct}`;
+    currentLog.push(`[${currentIndex + 1}] ${q.hint} → ${generatePuzzle(q.word)}\n你的答案：${input} ❌ 正確答案：${correct}`);
+  }
+  document.getElementById("feedback").innerText = feedback;
+  currentIndex++;
+  setTimeout(displayQuestion, 500);
+}
+
+function restart() {
+  currentIndex = 0;
+  score = 0;
+  shuffled = [...questions].sort(() => Math.random() - 0.5);
+  currentLog = [`=== 測驗時間：${new Date().toLocaleString()} ===`];
+  displayQuestion();
+}
+
+function toggleLog(type) {
+  const logDiv = document.getElementById("logDisplay");
+  if (logDiv.style.display === "none") {
+    let log = "";
+    if (type === "last") {
+      log = allLogs.length > 0 ? allLogs[allLogs.length - 1].join("\n") : "尚無最近紀錄";
+    } else if (type === "all") {
+      log = allLogs.map(log => log.join("\n")).join("\n\n") || "尚無紀錄";
+    }
+    logDiv.innerText = log;
+    logDiv.style.display = "block";
+  } else {
+    logDiv.style.display = "none";
+  }
+}
+
+restart();
+</script>
+
+</body>
+</html>
+
